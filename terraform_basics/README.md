@@ -10,13 +10,13 @@ You will have to create an AWS account if you don't have any.
 
 Create an IAM user that will be used for the entire study.
 
-**Best practice** - Avoid using the `root` account to perform tasks on AWS. It is recommended to create an IAM user for those tasks.
+**BEST PRACTICE** - Avoid using the `root` account to perform tasks on AWS. It is recommended to create an IAM user for those tasks.
 
 For the entirety of this study, I will create an IAM user with `AdministratorAccess`.
 
 - With this permission, I still have almost all the privileges that the **root** account has.
 
-**Best practice** - Users should be only assigned the least privilege they need to perform their job functions.
+**BEST PRACTICE** - Users should be only assigned the least privilege they need to perform their job functions.
 
 ### Generate AWS Credentials
 
