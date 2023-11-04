@@ -1,5 +1,30 @@
 # Terraform Basics
 
+**Table of Contents**
+
+- [Create an AWS resource](#create-an-aws-resource)
+  - [Create an AWS account](#create-an-aws-account)
+  - [Create an AWS IAM User](#create-an-aws-iam-user)
+  - [Generate AWS Credentials](#generate-aws-credentials)
+  - [Configure AWS CLI](#configure-aws-cli)
+  - [Install AWS CLI](#install-aws-cli)
+  - [Confirm AWS Credentials](#confirm-aws-credentials)
+- [Terraform Commands](#terraform-commands)
+  - [Initialize Project](#initialize-project)
+  - [Format Terraform file](#format-terraform-file)
+  - [Validate Terraform File](#validate-terraform-file)
+  - [Infrastructure Overview](#infrastructure-overview)
+  - [Create/Update Infrastructure](#create-update-infrastructure)
+  - [Terraform State File](#terraform-state-file)
+  - [Terraform Refresh](#terraform-refresh)
+  - [Terraform Output](#terraform-output)
+- [Declaring a Variable](#declaring-a-variable)
+  - [Input Variable](#input-variable)
+  - [TFVARS file](#tfvars-file)
+- [Local Values](#local-values)
+- [Output Values](#output-values)
+- [Extras](#extras)
+
 ## Create an AWS resource
 
 ### Create an AWS account
@@ -62,3 +87,205 @@ If everything checks out, let's go back to configuring our terraform script to p
 Remember that whatever `AMI` you are using for your EC2 instance has to be from the same region you configured in your credentials file.
 
 - AMI's are **region** specific.
+
+## Terraform Commands
+
+### Initialize Project
+
+To initialize our terraform project, we need to run the `init` command:
+
+```bash
+terraform init
+```
+
+This command technically pulls/downloads all the providers (plugins) and modules defined in the project. After this command ran successfully, you should now see a `.terraform` folder and a `.terraform.lock.hcl` file.
+
+- The `.terraform.lock.hcl` file is a dependency lock file that records specific versions of modules and/or providers being used.
+
+### Format Terraform file
+
+To format your configuration file to follow a consistent style.
+
+```bash
+terraform fmt
+```
+
+If your configuration file don't follow the standard way of writing terraform, then this command makes that adjustment by adding proper indentation and styling to the file.
+
+### Validate Terraform File
+
+To know if your configuration file is valid and there are no syntax errors or issues, like let's say having the wrong attributes for a resource, this command checks for all those issues for you.
+
+```bash
+terraform validate
+```
+
+It simply ensures your file contains the required fields and are of the correct type.
+
+**Note:** This command only checks for the presence of required attributes in your code but doesn't validate the value of your attributes.
+
+### Infrastructure Overview
+
+To generate an execution plan that shows what changes will be made to your infrastructure, use this command:
+
+```bash
+terraform plan
+```
+
+To see the overview of infrastructure changes, you use the `plan` command.
+
+### Create/Update Infrastructure
+
+To apply the changes defined in your execution plan which could be create, modify or destroy, run this command:
+
+```bash
+terraform apply
+```
+
+This command still generates an execution plan but this time it asks if you like those changes and will like to apply them. You apply them by simply typing `yes`. Any other command terminates the execution.
+
+Assuming that's the only resource you created, you should have something like this after your EC2 instance successfully deployed.
+
+![Image of a Successful Deployment](../assets/EC2-successful-deployment.png)
+
+From your study so far, I know you've come across the word `Idempotent` which means that no matter how many times I execute the `terraform apply` command, there will still be only `1` instance because that's what was specified in our configuration file.
+
+Now if we make an update to that resource parameter, it simply stops the resource and update it with whatever changes we made to the old resource. For example,
+
+- We decide to change the `instance type` of our EC2 from `t2.micro` to `t2.large`
+- That instance is stopped for the new changes to be made
+- Though that sounds good, beware, there will still be an interruption of your service
+
+![Image of Idempotent Explained](../assets/Idempotent_explained.png)
+
+**Before**
+![Image of Current Instance Type](../assets/EC2-t2-micro.png)
+
+**After**
+![Image of New Instance Type](../assets/EC2-t2-large.png)
+
+**Important:** After your first `apply`, take note of the `terraform.tfstate` file. That's your state file that manages your infrastructure. This file should not be tampered with except by an expert that knows what he/she is doing.
+
+### Terraform State File
+
+This is simply like a blueprint or record of your infrastructure. It's a crucial part of Terraform's operation. Here's what the terraform state file does:
+
+- It keeps track of what resources Terraform has created in your cloud environment, like servers, databases, and networks
+- It records the current status of your infrastructure. This means it knows what's already there and what changes Terraform has made
+- It helps Terraform understand the relationships between resources. For example, if you have a web server that relies on a database, the state file keeps that information
+- When you run Terraform commands like `apply` or `destroy`, the state file is used to synchronize the real-world state of your infrastructure with your configuration.
+- It ensures that you don't accidentally delete or modify resources outside of Terraform, as it might not be aware of those changes.
+
+In essence, the Terraform state file is a critical record-keeping tool that allows Terraform to manage and maintain your cloud infrastructure according to your desired configuration.
+
+### Terraform Refresh
+
+This command simply updates the state file with the real-world state of the infrastructure. Doesn't do anything major.
+
+```bash
+terraform refresh
+```
+
+### Terraform Output
+
+This command simply displays the values of output variables you have defined in your configuration file.
+
+```bash
+terraform output
+
+# to retrieve a specific output
+terraform output instance_ip_addr
+```
+
+**Note:** When you update the name of your output and do a `terraform refresh`, terraform gives you both the new one and the old one even if it longer exists. To fix this, simply run `terraform apply` to remove the old one.
+
+## Declaring a Variable
+
+This is a way to store and manage data that can be used in your infrastructure-as-code (IaC) configuration. It's like a placeholder for information that your Terraform configuration might need. [Read more](https://developer.hashicorp.com/terraform/language/values/variables)
+
+### Input Variable
+
+Use the `variable` block to declare an input variable.
+
+```bash
+variable instance_type {
+  type = string
+}
+```
+
+When using the input varibale, you will need to provide the input when running terraform commands by using the `-var` flag. This enables you to customize your infrastructure.
+
+There's also another way to pass that input to terraform without adding the `-var` flag. You will need to add that input value to a `terraform.tfvars` file.
+
+### TFVARS file
+
+To set lots of variables, it is more convenient to specify their values in a variable definitions file (with a filename ending in either `.tfvars` or `.tfvars.json`) and then specify that file on the command line with `-var-file` flag if the filename is not `terraform.tfvars`.
+
+If the file is named `terraform.tfvars`, by default terraform detects the file saving you from using the flag to specify the file.
+
+## Local Values
+
+Local values are like named placeholders for expressions within your Terraform configuration. These are the uses of a local value:
+
+- They are used to assign a name to an expression, making it easier to reference that expression multiple times in your configuration
+- They help reduce code duplication by allowing you to define complex expressions or calculations once and then use them wherever needed
+- Local values make your configuration more readable and understandable by giving meaningful names to complex or frequently used values
+- When you need to update an expression or value, you only need to do it in one place (the local value definition), ensuring consistency.
+- They are scoped within the module, which means they are available for use only within that module.
+
+In essence, local values simplify your configuration by providing a way to name and reuse expressions, promoting clean and maintainable code. [Read more](https://developer.hashicorp.com/terraform/language/values/locals)
+
+Here's an example of a code block:
+
+```bash
+locals {
+  project_name = "Dah_Queen"
+}
+
+resource "aws_instance" "app_server" {
+  ami           = var.my_ami
+  instance_type = var.instance_type
+
+  tags = {
+    Name = "${local.project_name}'s-Server"
+  }
+}
+```
+
+## Output Values
+
+Output values are like the results or information that Terraform provides after it has executed its configuration. They serve the following purposes:
+
+- They allow you to share specific information about your infrastructure with other parts of your system or users
+- They provide a way to communicate what Terraform has created or configured, like the IP address of a server, the URL of a load balancer, or any other relevant data
+- They can be used to extract and display important details that you might need for interacting with or managing your infrastructure
+- They can be accessed externally, which means you can retrieve this information and use it in scripts, documentation, or any other tools
+- They are often used for documenting the results of your Terraform configuration
+
+In essence, output values are a way to retrieve and make use of essential information about your infrastructure that Terraform has provisioned or modified. [Read more](https://developer.hashicorp.com/terraform/language/values/outputs)
+
+Here's an example of a code block:
+
+```bash
+resource "aws_instance" "app_server" {
+  ami           = var.my_ami
+  instance_type = var.instance_type
+
+  tags = {
+    Name = "${local.project_name}'s-Server"
+  }
+}
+
+output instance_ip_addr {
+  value = aws_instance.app_server.public_ip
+}
+```
+
+After adding your `output`s, since nothing changed in the infrastructure, just run a `terraform refresh` to refresh the state of your infrastructure.
+
+- Now you should see your outputs
+- Also if you type `terraform output`, you will get same results as well
+
+## Extras
+
+- [Github Markdown TOC Generator](https://ecotrust-canada.github.io/markdown-toc/)
