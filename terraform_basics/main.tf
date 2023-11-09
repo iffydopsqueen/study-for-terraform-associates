@@ -57,6 +57,7 @@ module "vpc" {
   }
 }
 
+# Terraform Alias
 // module "vpc" {
 //   source = "terraform-aws-modules/vpc/aws"
 //   providers = {
