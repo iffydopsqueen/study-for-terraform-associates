@@ -286,6 +286,101 @@ After adding your `output`s, since nothing changed in the infrastructure, just r
 - Now you should see your outputs
 - Also if you type `terraform output`, you will get same results as well
 
+## Modules
+
+Terraform modules are reusable pieces of Terraform code that can be used to create and manage infrastructure. They are like Lego bricks that you can snap together to build different things. [Read more](https://developer.hashicorp.com/terraform/language/modules)
+
+For example, you could have a module for creating a web server, a database, or a load balancer. You could then use these modules in your own Terraform configuration to create the infrastructure for your application.
+
+Here is a simple example of a Terraform module for creating a web server instance in AWS:
+
+```bash
+module "web_server" {
+  source = "./web_server"
+
+  # Set the name of the web server
+  name = "my-web-server"
+
+  # Set the size of the web server instance
+  instance_type = "t2.micro"
+}
+```
+
+**Remember:** When you add a `module` to your Terraform code, you have to always run `terraform init` to install the necessary module into your project.
+
+Terraform modules are a great way to reuse code and make your Terraform configuration more modular and reusable. They can also help you to keep your code **DRY (Don't Repeat Yourself)**.
+
+Here are some of the benefits of using Terraform modules:
+
+- **Reusability:** Modules can be reused in multiple Terraform configurations, which saves you time and effort.
+- **Modularity:** Modules make your Terraform configuration more modular and reusable, which makes it easier to maintain and update.
+- **DRY:** Modules help you to avoid repeating yourself in your Terraform configuration, which makes your code more concise and easier to read.
+
+## Terraform Alias - Provider Configuration
+
+A Terraform alias for a provider is a shortcut that you can use to refer to a specific provider configuration.
+
+For example, you could create an alias for the AWS provider configuration that manages resources in the `us-east-1` region. You could then use this alias to manage resources in that region without having to specify the full provider configuration name each time. [Read more](https://developer.hashicorp.com/terraform/language/providers/configuration)
+
+To create a Terraform alias for a provider, you use the `alias` keyword in the provider block. For example, the following code creates an alias for the AWS provider configuration that manages resources in the `us-west-2` region:
+
+```bash
+provider "aws" {
+  region = "us-east-1"
+}
+```
+
+Additional provider configuration for west coast region; resources can reference this as `aws.west`.
+
+```bash
+provider "aws" {
+  alias  = "west"
+  region = "us-west-2"
+}
+```
+
+### Referring to Alternate Provider Configurations
+
+To use an alternate provider configuration for a resource or data source:
+
+```bash
+resource "aws_instance" "foo" {
+  provider = aws.west
+
+  # ...
+}
+```
+
+To select alternate provider configurations for a module, use its `providers` meta-argument to specify which provider configurations to use:
+
+```bash
+module "aws_vpc" {
+  source = "./aws_vpc"
+  providers = {
+    aws = aws.west
+  }
+}
+```
+
+## Troubleshooting
+
+I created a `VPC` out of the scope of my terraform infrastructure and later on I wanted Terraform to start managing it for me, like destroying it when I no longer need it.
+
+First, I have to import the resource into Terraform state, so it begins managing it.
+
+Here's the command I used to achieve that:
+
+```bash
+# Import the VPC
+terraform import module.vpc.aws_vpc.this vpc-00b882ff60ac022ab
+
+# Plan the import
+terraform plan
+
+# Apply the import
+terraform apply
+```
+
 ## Extras
 
 - [Github Markdown TOC Generator](https://ecotrust-canada.github.io/markdown-toc/)
