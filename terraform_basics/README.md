@@ -377,7 +377,7 @@ module "aws_vpc" {
 }
 ```
 
-## Troubleshooting
+## Troubleshooting Out of Scope Infrastructure
 
 I created a `VPC` out of the scope of my terraform infrastructure and later on I wanted Terraform to start managing it for me, like destroying it when I no longer need it.
 
@@ -395,6 +395,66 @@ terraform plan
 # Apply the import
 terraform apply
 ```
+
+## Terraform Workspace
+
+The `workspace` command is used in Terraform to manage multiple workspaces within a single configuration. Workspaces allow you to maintain different instances of your infrastructure, such as **development**, **sandbox**, and **production**, within the same Terraform configuration files.
+
+Here are the key commands associated with `terraform workspace`:
+
+### New Workspace
+
+This command is used to create a new workspace. For example, you might create workspaces named `dev`, `sbx`, and `prd` to represent different environments.
+
+Example:
+
+```bash
+terraform workspace new dev
+```
+
+### List Workspaces
+
+This command lists all the available workspaces in the current Terraform configuration.
+
+Example:
+
+```bash
+terraform workspace list
+```
+
+### Select Workspace
+
+This command allows you to switch between different workspaces. You specify the workspace name as an argument.
+
+Example:
+
+```bash
+terraform workspace select prd
+```
+
+### Show Workspace
+
+This command displays the name of the currently selected workspace.
+
+Example:
+
+```bash
+terraform workspace show
+```
+
+### Delete Workspace
+
+This command deletes a workspace. Be cautious with this command, as it irreversibly removes the workspace and its associated state.
+
+Example:
+
+```bash
+terraform workspace delete sbx
+```
+
+Workspaces are particularly useful when you want to maintain separate states for different environments.
+Each workspace has its own state file, allowing you to make changes and apply configurations to one environment without affecting others.
+This helps in keeping the infrastructure configurations modular and allows for easier management of different deployment scenarios.
 
 ## Extras
 
