@@ -199,6 +199,21 @@ terraform output instance_ip_addr
 
 **Note:** When you update the name of your output and do a `terraform refresh`, terraform gives you both the new one and the old one even if it longer exists. To fix this, simply run `terraform apply` to remove the old one.
 
+### Terraform Destroy
+
+This command is used to tear down and remove the infrastructure that Terraform has provisioned.
+
+```bash
+# common way to do it
+terraform destroy
+terraform destroy -auto-approve
+
+# an alternative
+terraform apply -destroy
+```
+
+**Note:** It's important to note that running terraform destroy is a critical operation, as it irreversibly removes infrastructure. Care should be taken, especially in production environments, to avoid accidental data loss or service disruptions. Always review the execution plan and be certain of the consequences before confirming the destruction of resources.
+
 ## Declaring a Variable
 
 This is a way to store and manage data that can be used in your infrastructure-as-code (IaC) configuration. It's like a placeholder for information that your Terraform configuration might need. [Read more](https://developer.hashicorp.com/terraform/language/values/variables)
