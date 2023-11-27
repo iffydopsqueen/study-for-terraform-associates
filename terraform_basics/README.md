@@ -199,6 +199,21 @@ terraform output instance_ip_addr
 
 **Note:** When you update the name of your output and do a `terraform refresh`, terraform gives you both the new one and the old one even if it longer exists. To fix this, simply run `terraform apply` to remove the old one.
 
+### Terraform Destroy
+
+This command is used to tear down and remove the infrastructure that Terraform has provisioned.
+
+```bash
+# common way to do it
+terraform destroy
+terraform destroy -auto-approve
+
+# an alternative
+terraform apply -destroy
+```
+
+**Note:** It's important to note that running terraform destroy is a critical operation, as it irreversibly removes infrastructure. Care should be taken, especially in production environments, to avoid accidental data loss or service disruptions. Always review the execution plan and be certain of the consequences before confirming the destruction of resources.
+
 ## Declaring a Variable
 
 This is a way to store and manage data that can be used in your infrastructure-as-code (IaC) configuration. It's like a placeholder for information that your Terraform configuration might need. [Read more](https://developer.hashicorp.com/terraform/language/values/variables)
@@ -362,7 +377,7 @@ module "aws_vpc" {
 }
 ```
 
-## Troubleshooting
+## Troubleshooting Out of Scope Infrastructure
 
 I created a `VPC` out of the scope of my terraform infrastructure and later on I wanted Terraform to start managing it for me, like destroying it when I no longer need it.
 
@@ -380,6 +395,66 @@ terraform plan
 # Apply the import
 terraform apply
 ```
+
+## Terraform Workspace
+
+The `workspace` command is used in Terraform to manage multiple workspaces within a single configuration. Workspaces allow you to maintain different instances of your infrastructure, such as **development**, **sandbox**, and **production**, within the same Terraform configuration files.
+
+Here are the key commands associated with `terraform workspace`:
+
+### New Workspace
+
+This command is used to create a new workspace. For example, you might create workspaces named `dev`, `sbx`, and `prd` to represent different environments.
+
+Example:
+
+```bash
+terraform workspace new dev
+```
+
+### List Workspaces
+
+This command lists all the available workspaces in the current Terraform configuration.
+
+Example:
+
+```bash
+terraform workspace list
+```
+
+### Select Workspace
+
+This command allows you to switch between different workspaces. You specify the workspace name as an argument.
+
+Example:
+
+```bash
+terraform workspace select prd
+```
+
+### Show Workspace
+
+This command displays the name of the currently selected workspace.
+
+Example:
+
+```bash
+terraform workspace show
+```
+
+### Delete Workspace
+
+This command deletes a workspace. Be cautious with this command, as it irreversibly removes the workspace and its associated state.
+
+Example:
+
+```bash
+terraform workspace delete sbx
+```
+
+Workspaces are particularly useful when you want to maintain separate states for different environments.
+Each workspace has its own state file, allowing you to make changes and apply configurations to one environment without affecting others.
+This helps in keeping the infrastructure configurations modular and allows for easier management of different deployment scenarios.
 
 ## Extras
 
