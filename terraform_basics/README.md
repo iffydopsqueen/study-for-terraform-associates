@@ -18,11 +18,28 @@
   - [Terraform State File](#terraform-state-file)
   - [Terraform Refresh](#terraform-refresh)
   - [Terraform Output](#terraform-output)
+  - [Terraform Destroy](#terraform-destroy)
 - [Declaring a Variable](#declaring-a-variable)
   - [Input Variable](#input-variable)
   - [TFVARS file](#tfvars-file)
 - [Local Values](#local-values)
 - [Output Values](#output-values)
+- [Modules](#modules)
+- [Terraform Alias - Provider Configuration](#terraform-alias---provider-configuration)
+  - [Referring to Alternate Provider Configurations](#referring-to-alternate-provider-configurations)
+- [Troubleshooting Out of Scope Infrastructure](#troubleshooting-out-of-scope-infrastructure)
+- [Terraform Workspace](#terraform-workspace)
+  - [New Workspace](#new-workspace)
+  - [List Workspaces](#list-workspaces)
+  - [Select Workspace](#select-workspace)
+  - [Show Workspace](#show-workspace)
+  - [Delete Workspace](#delete-workspace)
+- [Terraform Cloud](#terraform-cloud)
+  - [Setting Up Terraform Cloud](#setting-up-terraform-cloud)
+    - [Set Up on the CLI](#set-up-on-the-cli)
+    - [Initialize Remote Workspace](#initialize-remote-workspace)
+    - [Set Variables on Terraform Cloud](#set-variables-on-terraform-cloud)
+    - [Test the Set Up](#test-the-set-up)
 - [Extras](#extras)
 
 ## Create an AWS resource
@@ -156,12 +173,14 @@ Now if we make an update to that resource parameter, it simply stops the resourc
 - That instance is stopped for the new changes to be made
 - Though that sounds good, beware, there will still be an interruption of your service
 
-![Image of Idempotent Explained](../assets/Idempotent_explained.png)
+  ![Image of Idempotent Explained](../assets/Idempotent_explained.png)
 
-**Before**
+**BEFORE**
+
 ![Image of Current Instance Type](../assets/EC2-t2-micro.png)
 
-**After**
+**AFTER**
+
 ![Image of New Instance Type](../assets/EC2-t2-large.png)
 
 **Important:** After your first `apply`, take note of the `terraform.tfstate` file. That's your state file that manages your infrastructure. This file should not be tampered with except by an expert that knows what he/she is doing.
@@ -456,6 +475,72 @@ Workspaces are particularly useful when you want to maintain separate states for
 Each workspace has its own state file, allowing you to make changes and apply configurations to one environment without affecting others.
 This helps in keeping the infrastructure configurations modular and allows for easier management of different deployment scenarios.
 
+## Terraform Cloud
+
+Terraform Cloud is a collaboration platform for Terraform. It provides a centralized environment for managing and executing Terraform configurations, enabling collaboration among team members and offering features such as remote state management, version control integration, and a user interface for viewing and managing Terraform runs.
+
+### Setting Up Terraform Cloud
+
+1. Create an account on **Terraform Cloud** if you don't have one.
+
+2. After signing in, create an **Organization**.
+
+   - An organization is a top-level grouping for your Terraform Cloud workspaces.
+
+   ![Image of Terraform Cloud Organization Creation](../assets/terraform-cloud-org-creation.png)
+
+3. Create a new workspace within your organization and connect it to your version control system if needed.
+
+   - Workspaces in Terraform Cloud represent individual projects or environments.
+
+   ![Image of Terraform Cloud Workspace Creation](../assets/terraform-cloud-workspace-creation.png)
+
+4. Link your local workspace CLI to the remote one. This allows you to execute commands locally on your CLI and they still show up on Terraform Cloud as well.
+
+#### Set Up on the CLI
+
+5. Login to Terraform Cloud using the command `terraform login`. When this command gets executed, you'll be prompted to type "yes" to proceed.
+
+   ![Image of Terraform Cloud Login](../assets/terraform-login.png)
+
+6. After typing "yes," a link will open in your browser for token creation. If no link opens, use the alternative link - [Terraform Token Creation](https://app.terraform.io/app/settings/tokens?source=terraform-login)
+
+7. Go ahead and choose the expiration date of your choice
+
+   ![Image of Terraform Cloud User Token](../assets/terraform-cloud-user-token.png)
+
+8. Copy the generated token to your terminal and paste. You won't see the token as you paste, but press **Enter**.
+
+9. You are now logged in to your remote Terraform workspace.
+
+   ![Image of Terraform Cloud User Token](../assets/terraform-cloud-login-successful.png)
+
+#### Initialize Remote Workspace
+
+10. Now, run the `terraform init`` command to initialize the workspace.
+
+11. You will be prompted to move your existing state into the remote workspace. Type "yes" to proceed. Your local state file is now moved to the Terraform remote workspace.
+
+#### Set Variables on Terraform Cloud
+
+12. Because our remote workspace runs on its servers, it is not aware of any variables we have set in our locals. So let's go ahead and set our variables on Terraform Cloud.
+
+13. We will need to set both **Terraform Variables** and **Environment Variables**
+
+    ![Image of Terraform Cloud Terraform Variable](../assets/terraform-cloud-tf-variables.png)
+
+    ![Image of Terraform Cloud Env Variable](../assets/terraform-cloud-env-variables.png)
+
+14. Your AWS credentials be set as an environment variable. Be aware!
+
+#### Test the Set Up
+
+15. With all the necessary variables set, execute the command `terraform apply`. If nothing has changed in your infrastructure, there shouldn't be any updates to apply.
+
+**Note:** Terraform Cloud offers a free tier with limited features and capacity, and there are also paid plans for additional capabilities and resources. The setup process may vary slightly depending on your specific use case and requirements. Refer to the [official documentation](https://developer.hashicorp.com/terraform/cloud-docs) for the most up-to-date and detailed instructions.
+
 ## Extras
 
 - [Github Markdown TOC Generator](https://ecotrust-canada.github.io/markdown-toc/)
+
+- [Migrating to Terraform Cloud](https://developer.hashicorp.com/terraform/cloud-docs/migrate#step-5-edit-the-backend-configuration)
