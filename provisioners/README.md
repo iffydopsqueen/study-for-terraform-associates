@@ -138,22 +138,37 @@ Terraform Provisioners are a feature that allows you to execute scripts or comma
 
    ```bash
    resource "aws_instance" "example" {
-     ami           = "ami-0c55b159cbfafe1f0"
-     instance_type = "t2.micro"
+      ami           = "ami-0c55b159cbfafe1f0"
+      instance_type = "t2.micro"
 
-     connection {
-       type        = "ssh"
-       user        = "ec2-user"
-       private_key = file("~/.ssh/id_rsa")
-     }
+      provisioner "remote-exec" {
+        inline = [
+          "echo 'Hello, World!' > /tmp/hello.txt",
+        ]
 
-     provisioner "remote-exec" {
-       inline = ["echo 'Hello, World!'"]
-     }
-   }
+        connection {
+          type        = "ssh"
+          user        = "ec2-user"
+          private_key = file("~/.ssh/id_rsa")
+          host        = self.public_ip
+        }
+      }
+    }
    ```
 
-   - In this example, the `connection` block configures an SSH connection to the AWS instance, and the subsequent `remote-exec` provisioner uses this connection to execute the `"echo 'Hello, World!'"` command on the instance.
+   - In this example:
+
+     - The `remote-exec` provisioner is used to execute a simple command, echoing `"Hello, World!"` to a file on the remote instance.
+
+     - The `connection` block is used to specify the connection details.
+
+       - `type` specifies the type of connection (in this case, SSH).
+
+       - `user` specifies the SSH username.
+
+       - `private_key` specifies the path to the private key for authentication.
+
+       - `host` specifies the hostname or IP address of the remote instance. Here, `self.public_ip` is used to dynamically retrieve the public IP address of the created AWS instance.
 
 6. **Null Resources**
 

@@ -9,7 +9,7 @@ data "aws_ami" "latest_amazon_linux" {
   }
 }
 
-resource "aws_instance" "example" {
+resource "aws_instance" "web-server" {
   ami           = data.aws_ami.latest_amazon_linux.id
   instance_type = "t2.micro"
 }
