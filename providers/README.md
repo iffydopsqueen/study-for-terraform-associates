@@ -1,7 +1,5 @@
 # Terraform Providers
 
-**Table of Contents**
-
 ## Terraform Providers
 
 A Terraform provider is a plugin that allows Terraform to interact with and manage resources within a specific infrastructure platform or service.
@@ -45,3 +43,9 @@ Providers are a crucial component of Terraform. Each provider is responsible for
 Terraform includes built-in providers for popular cloud platforms like AWS, Azure, Google Cloud, as well as providers for various on-premises infrastructure and services.
 
 Additionally, the Terraform Registry allows users to discover and use **community-contributed** providers for a wide range of platforms and services.
+
+## Extras
+
+- [Github Markdown TOC Generator](https://ecotrust-canada.github.io/markdown-toc/)
+
+- [Terraform Providers.](https://developer.hashicorp.com/terraform/language/providers/configuration)
