@@ -1,7 +1,5 @@
 # Terraform Providers
 
-**Table of Contents**
-
 ## Terraform Providers
 
 A Terraform provider is a plugin that allows Terraform to interact with and manage resources within a specific infrastructure platform or service.
