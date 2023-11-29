@@ -35,7 +35,7 @@ variable "my_ami" {
 }
 
 resource "aws_instance" "app_server" {
-  ami           = module.web_server.my_ami
+  ami           = var.my_ami
   instance_type = var.instance_type
 
   tags = {
